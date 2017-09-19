@@ -6,12 +6,27 @@
 const express = require('express');//加载express模块
 const swig = require('swig');//加载模板处理模块
 const mongoose = require('mongoose');//数据库mok
+const bodyParser = require('body-parser');
+const cookies = require('cookies');
 const admin = require('./routers/admin');//后台管理路由
 const api = require('./routers/api');//API接口
 const web = require('./routers/web');//前台路由
 
 
 const app = express();//创建app应用
+// 解析post数据
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(function (req,res,next) {
+    req.cookies = new cookies(req,res);
+    req.userInfo={};
+    if(req.cookies.get('userInfo')){
+        try {
+            req.userInfo = JSON.parse(req.cookies.get('userInfo'));
+        }catch (e){}
+    }
+    // console.log(req.cookies.get('userInfo'));
+    next();
+});
 //配置应用模板，定义当前应用使用的模板引擎
 app.engine('html',swig.renderFile)//参数1：模板引擎的名称同时也是模板文件的后缀，参数2：用于解析处理模板内容的方法
 //设置模板文件存放的目录，第一个参数必须是views,第二个参数是存放目录
