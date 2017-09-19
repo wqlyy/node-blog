@@ -5,6 +5,7 @@
 
 const express = require('express');//加载express模块
 const swig = require('swig');//加载模板处理模块
+const mongoose = require('mongoose');//数据库mok
 const admin = require('./routers/admin');//后台管理路由
 const api = require('./routers/api');//API接口
 const web = require('./routers/web');//前台路由
@@ -22,11 +23,17 @@ swig.setDefaults({cache:false})
 //静态文件托管
 app.use('/public',express.static(__dirname+'/public'));
 
-
+// 路由
 app.use('/admin',admin);
 app.use('/api',api);
 app.use('/',web);
-
-const server = app.listen(8080,()=>{
-    console.log('The service runs and listens on port http://localhost:'+server.address().port)
+var uri = 'mongodb://127.0.0.1:27018/blog';
+mongoose.connect(uri,(err)=>{
+    if(err){
+        console.log('数据库连接失败');
+    }else{
+        const server = app.listen(8080,()=>{
+            console.log('The service runs and listens on port http://localhost:'+server.address().port)
+        });
+    }
 });
