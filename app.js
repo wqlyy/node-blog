@@ -11,7 +11,7 @@ const cookies = require('cookies');
 const admin = require('./routers/admin');//后台管理路由
 const api = require('./routers/api');//API接口
 const web = require('./routers/web');//前台路由
-
+const User = require('./models/User');
 
 const app = express();//创建app应用
 // 解析post数据
@@ -22,10 +22,16 @@ app.use(function (req,res,next) {
     if(req.cookies.get('userInfo')){
         try {
             req.userInfo = JSON.parse(req.cookies.get('userInfo'));
-        }catch (e){}
+            User.findById(req.userInfo._id).then(function(userInfo){
+                req.userInfo.isAdmin = Boolean(userInfo.isAdmin);
+                next()
+            })
+        }catch (e){
+            next()
+        }
+    }else{
+        next();
     }
-    // console.log(req.cookies.get('userInfo'));
-    next();
 });
 //配置应用模板，定义当前应用使用的模板引擎
 app.engine('html',swig.renderFile)//参数1：模板引擎的名称同时也是模板文件的后缀，参数2：用于解析处理模板内容的方法
@@ -42,7 +48,7 @@ app.use('/public',express.static(__dirname+'/public'));
 app.use('/admin',admin);
 app.use('/api',api);
 app.use('/',web);
-var uri = 'mongodb://127.0.0.1:27018/blog';
+var uri = 'mongodb://127.0.0.1:27017/blog';
 mongoose.connect(uri,(err)=>{
     if(err){
         console.log('数据库连接失败');

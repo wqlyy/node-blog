@@ -3,7 +3,7 @@
 {% block main %}
 
 <ol class="breadcrumb">
-    <li><a href="/">管理首页</a></li>
+    <li><a href="/admin">管理首页</a></li>
     <li><span>用户列表</span></li>
 </ol>
 
@@ -11,7 +11,7 @@
 
 {% include 'page.html' %}
 
-<table class="table table-hover table-striped">
+<table class="table table-bordered table-hover table-striped">
 
     <tr>
         <th>ID</th>
@@ -26,7 +26,11 @@
         <td>{{user.username}}</td>
         <td>{{user.password}}</td>
         <td>
-            {%if user.isAdmin%}是{%endif%}
+            {% if user.isAdmin %}
+            是
+            {% else %}
+            否
+            {% endif %}
         </td>
     </tr>
     {% endfor %}
