@@ -4,7 +4,7 @@ var pages = 0;
 var comments = [];
 
 //提交评论
-$('#messageBtn').on('click', function() {
+$('#messageBtn').on('click', function () {
     $.ajax({
         type: 'POST',
         url: '/api/comment/post',
@@ -12,8 +12,8 @@ $('#messageBtn').on('click', function() {
             contentid: $('#contentId').val(),
             content: $('#messageContent').val()
         },
-        success: function(responseData) {
-            //console.log(responseData);
+        success: function (responseData) {
+            // console.log(responseData);
             $('#messageContent').val('');
             comments = responseData.data.comments.reverse();
             renderComment();
@@ -27,13 +27,14 @@ $.ajax({
     data: {
         contentid: $('#contentId').val()
     },
-    success: function(responseData) {
-        comments =responseData.data.reverse();
+    success: function (responseData) {
+        // console.log(responseData);
+        comments = responseData.data.reverse();
         renderComment();
     }
 });
 
-$('.pager').delegate('a', 'click', function() {
+$('.pager').delegate('a', 'click', function () {
     if ($(this).parent().hasClass('previous')) {
         page--;
     } else {
@@ -47,11 +48,11 @@ function renderComment() {
     $('#messageCount').html(comments.length);
 
     pages = Math.max(Math.ceil(comments.length / prepage), 1);
-    var start = Math.max(0, (page-1) * prepage);
+    var start = Math.max(0, (page - 1) * prepage);
     var end = Math.min(start + prepage, comments.length);
 
     var $lis = $('.pager li');
-    $lis.eq(1).html( page + ' / ' +  pages);
+    $lis.eq(1).html(page + ' / ' + pages);
 
     if (page <= 1) {
         page = 1;
@@ -70,9 +71,9 @@ function renderComment() {
         $('.messageList').html('<div class="messageBox"><p>还没有评论</p></div>');
     } else {
         var html = '';
-        for (var i=start; i<end; i++) {
-            html += '<div class="messageBox">'+
-                '<p class="name clear"><span class="fl">'+comments[i].username+'</span><span class="fr">'+ formatDate(comments[i].postTime) +'</span></p><p>'+comments[i].content+'</p>'+
+        for (var i = start; i < end; i++) {
+            html += '<div class="messageBox">' +
+                '<p class="name clear"><span class="fl">' + comments[i].username + '</span><span class="fr">' + formatDate(comments[i].postTime) + '</span></p><p>' + comments[i].content + '</p>' +
                 '</div>';
         }
         $('.messageList').html(html);
@@ -82,5 +83,9 @@ function renderComment() {
 
 function formatDate(d) {
     var date1 = new Date(d);
-    return date1.getFullYear() + '年' + (date1.getMonth()+1) + '月' + date1.getDate() + '日 ' + date1.getHours() + ':' + date1.getMinutes() + ':' + date1.getSeconds();
+    return date1.getFullYear() + '年' + addZero(date1.getMonth() + 1) + '月' + addZero(date1.getDate()) + '日 ' + addZero(date1.getHours()) + ':' + addZero(date1.getMinutes()) + ':' + addZero(date1.getSeconds());
+}
+
+function addZero(number) {
+    return number < 10 ? '0' + number : number;
 }

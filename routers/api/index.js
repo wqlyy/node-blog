@@ -4,7 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
-
+const Content = require('../../models/Content');
 
 //数据统一返回格式
 var responseData;
@@ -107,4 +107,41 @@ router.get('/user/logout',(req,res)=>{
     req.cookies.set('userInfo',null);
     res.json(responseData);
 });
+
+// 文章所有评论
+router.get('/comment',function(req,res){
+    var contentid = req.query.contentid || '';
+    Content.findOne({
+        _id:contentid
+    }).then(function(content){
+        responseData.message="获取所有评论成功";
+        responseData.data = content.comments;
+        res.json(responseData)
+    });
+});
+
+// 评论提交
+router.post('/comment/post',function(req,res){
+    var contentId = req.body.contentid || '';
+    var postData = {
+        username:req.userInfo.username,
+        postTime:new Date(),
+        content:req.body.content || '自动评论，内容为空'
+    }
+
+    //查询
+    Content.findOne({
+        _id:contentId
+    }).then(function(content){
+        content.comments.push(postData);
+        return content.save()
+    }).then(function(newContent){
+        responseData.message="评论成功";
+        responseData.data = newContent;
+        res.json(responseData)
+    });
+});
+
+
+
 module.exports = router;
