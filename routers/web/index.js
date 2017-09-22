@@ -54,7 +54,8 @@ router.get('/view', function (req, res) {
     var contentId = req.query.contentid || "";
     Content.findOne({
         _id: contentId
-    }).then(function (contents) {
+    }).populate(['category', 'user']).then(function (contents) {
+        console.log(contents);
         data.content = contents;
         //todo:阅读量处理逻辑
         contents.views++;
